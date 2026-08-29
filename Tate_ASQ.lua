@@ -335,26 +335,3 @@ eventFrame:SetScript("OnEvent", function(self, event, arg1)
     end
 end)
 
----------------------------------------------------------------------------
---  Addon compartment entry points (declared in the TOC)
----------------------------------------------------------------------------
-function Tate_ASQ_OnCompartmentClick(addonName, buttonName)
-    if _G.Tate_ASQOptions then
-        _G.Tate_ASQOptions.Toggle()
-    end
-end
-
-function Tate_ASQ_OnCompartmentEnter(addonName, button)
-    if button and MenuUtil and MenuUtil.ShowTooltip then
-        MenuUtil.ShowTooltip(button, function(tooltip)
-            tooltip:SetText(L("Spell Queue"))
-            tooltip:AddLine(L("Open Settings"), 1, 1, 1, true)
-        end)
-    end
-end
-
-function Tate_ASQ_OnCompartmentLeave(addonName, button)
-    if button and MenuUtil and MenuUtil.HideTooltip then
-        MenuUtil.HideTooltip(button)
-    end
-end

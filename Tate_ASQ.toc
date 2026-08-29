@@ -5,9 +5,6 @@
 ## Version: 1.0.0
 ## SavedVariables: Tate_ASQDB
 ## IconTexture: Interface\Icons\INV_Misc_QuestionMark
-## AddonCompartmentFunc: Tate_ASQ_OnCompartmentClick
-## AddonCompartmentFuncOnEnter: Tate_ASQ_OnCompartmentEnter
-## AddonCompartmentFuncOnLeave: Tate_ASQ_OnCompartmentLeave
 
 Tate_ASQ_Formula.lua
 Tate_ASQ.lua

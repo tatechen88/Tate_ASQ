@@ -277,8 +277,17 @@ local function AddCycleRow(frame, y, labelText, entries, get, set)
         return type(e) == "table" and L(e.label) or L(tostring(e))
     end
 
+    local function FindEntry(value)
+        for _, e in ipairs(entries) do
+            local v = type(e) == "table" and e.value or e
+            if v == value then return e end
+        end
+        return nil
+    end
+
     local function Update()
-        btn._text:SetText(EntryText(get()))
+        local entry = FindEntry(get()) or get()
+        btn._text:SetText(EntryText(entry))
     end
     btn:SetScript("OnClick", function()
         local current = get()
@@ -594,53 +603,6 @@ statusUpdateFrame:SetScript("OnUpdate", function(self, elapsed)
 end)
 
 ---------------------------------------------------------------------------
---  Minimap button (direct, reliable fallback in addition to AddonCompartment)
----------------------------------------------------------------------------
-local minimapButton
-
-local function CreateMinimapButton()
-    if minimapButton then return minimapButton end
-
-    -- Parent to UIParent (not the minimap cluster) so other addons that manage
-    -- minimap buttons (e.g. EllesmereUI) cannot hide or reparent this button.
-    minimapButton = CreateActionButton(UIParent, 30, 30)
-    minimapButton:ClearAllPoints()
-    minimapButton:SetPoint("TOPRIGHT", UIParent, "TOPRIGHT", -180, -30)
-    minimapButton:SetFrameStrata("HIGH")
-    minimapButton:SetFrameLevel(500)
-    minimapButton:SetMovable(true)
-    minimapButton:RegisterForDrag("LeftButton")
-    minimapButton:SetClampedToScreen(true)
-
-    minimapButton._bg:SetColorTexture(ACCENT_R, ACCENT_G, ACCENT_B, 0.92)
-    minimapButton._text:SetText("SQ")
-    minimapButton._text:SetFontObject(GameFontNormal)
-    minimapButton._text:SetTextColor(0, 0, 0, 1)
-
-    minimapButton._dragging = false
-    minimapButton:SetScript("OnMouseDown", function(self) self._dragging = false end)
-    minimapButton:SetScript("OnDragStart", function(self) self._dragging = true; self:StartMoving() end)
-    minimapButton:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
-    minimapButton:SetScript("OnMouseUp", function(self, button)
-        if button == "LeftButton" and not self._dragging then
-            Options.Toggle()
-        end
-        self._dragging = false
-    end)
-    minimapButton:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-        GameTooltip:SetText(L("Spell Queue"), 1, 1, 1)
-        GameTooltip:AddLine(L("Open Settings"), 1, 1, 1, true)
-        GameTooltip:AddLine(L("Drag to move"), 1, 1, 1, true)
-        GameTooltip:Show()
-    end)
-    minimapButton:SetScript("OnLeave", function() GameTooltip:Hide() end)
-    minimapButton:Show()
-
-    return minimapButton
-end
-
----------------------------------------------------------------------------
 --  Standard Interface Options entry (Options -> AddOns)
 ---------------------------------------------------------------------------
 local function CreateInterfaceOptionsPanel()
@@ -669,7 +631,6 @@ do
     init:SetScript("OnEvent", function(self)
         self:UnregisterEvent("PLAYER_LOGIN")
         if not Addon.loaded then return end
-        CreateMinimapButton()
         CreateInterfaceOptionsPanel()
         Options.UpdateStatusBar()
     end)
