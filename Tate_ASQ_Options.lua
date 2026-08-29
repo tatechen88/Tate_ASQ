@@ -95,7 +95,7 @@ end
 
 local function CreatePanelFrame()
     local frame = CreateFrame("Frame", "Tate_ASQ_Settings", UIParent)
-    frame:SetSize(460, 580)
+    frame:SetSize(460, 470)
     frame:SetPoint("CENTER")
     frame:SetFrameStrata("DIALOG")
     frame:EnableMouse(true)
@@ -140,7 +140,7 @@ local function AddRow(frame, y, labelText)
     local row = CreateFrame("Frame", nil, frame)
     row:SetPoint("TOPLEFT", frame, "TOPLEFT", 16, y)
     row:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -16, y)
-    row:SetHeight(44)
+    row:SetHeight(36)
 
     local bg = CreateTexture(row)
     SetColor(bg, ROW_R, ROW_G, ROW_B, ROW_A)
@@ -214,24 +214,47 @@ end
 ---------------------------------------------------------------------------
 --  Row widgets
 ---------------------------------------------------------------------------
-local function AddToggleRow(frame, y, labelText, get, set)
-    local row = AddRow(frame, y, labelText)
-    local btn = CreateActionButton(row, 90, 26)
-    btn:SetPoint("RIGHT", -14, 0)
+local function CreateSwitch(parent, get, set)
+    local sw = CreateFrame("Button", nil, parent)
+    sw:SetSize(46, 22)
+    sw:RegisterForClicks("LeftButtonUp")
+
+    local track = sw:CreateTexture(nil, "BACKGROUND")
+    track:SetAllPoints()
+    AddBorder(sw, 1, 1, 1, 0.12)
+
+    local knob = sw:CreateTexture(nil, "OVERLAY")
+    knob:SetSize(18, 18)
+
+    sw._track = track
+    sw._knob = knob
 
     local function Update()
         local v = get()
-        btn._text:SetText(v and L("On") or L("Off"))
-        btn._text:SetTextColor(v and 0 or TEXT_R, v and 0 or TEXT_G, v and 0 or TEXT_B, 1)
-        btn._bg:SetColorTexture(v and ACCENT_R or 0.10, v and ACCENT_G or 0.13, v and ACCENT_B or 0.16, 0.9)
+        sw._track:SetColorTexture(v and ACCENT_R or 0.16, v and ACCENT_G or 0.18, v and ACCENT_B or 0.20, v and 0.95 or 0.9)
+        sw._knob:ClearAllPoints()
+        if v then
+            sw._knob:SetPoint("RIGHT", sw, "RIGHT", -3, 0)
+        else
+            sw._knob:SetPoint("LEFT", sw, "LEFT", 3, 0)
+        end
+        sw._knob:SetColorTexture(1, 1, 1, 0.95)
     end
-    btn:SetScript("OnClick", function()
+
+    sw:SetScript("OnClick", function()
         set(not get())
         Update()
         UpdateRows()
     end)
     AddRowUpdater(Update)
     Update()
+    return sw
+end
+
+local function AddToggleRow(frame, y, labelText, get, set)
+    local row = AddRow(frame, y, labelText)
+    local sw = CreateSwitch(row, get, set)
+    sw:SetPoint("RIGHT", -14, 0)
     return row
 end
 
@@ -363,21 +386,21 @@ local function BuildSettings(frame, showTitle)
         CreateTitleBar(frame)
     end
 
-    local y = showTitle and -54 or -16
-    local rowH = 44
+    local y = showTitle and -52 or -12
+    local rowH = 36
 
     -- Status block ----------------------------------------------------------
     local status = CreateFrame("Frame", nil, frame)
     status:SetPoint("TOPLEFT", frame, "TOPLEFT", 18, y)
     status:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -18, y)
-    status:SetHeight(130)
+    status:SetHeight(108)
     local statusBg = CreateTexture(status)
     SetColor(statusBg, 0, 0, 0, 0.28)
     AddBorder(status, 1, 1, 1, 0.08)
 
     local function AddStatusLine(i, labelText)
         local line = CreateFrame("Frame", nil, status)
-        line:SetPoint("TOPLEFT", status, "TOPLEFT", 14, -10 - i * 24)
+        line:SetPoint("TOPLEFT", status, "TOPLEFT", 14, -8 - i * 20)
         line:SetPoint("TOPRIGHT", status, "TOPRIGHT", -14, 0)
         line:SetHeight(20)
         local label = CreateText(line)
@@ -449,7 +472,7 @@ local function BuildSettings(frame, showTitle)
     AddRowUpdater(UpdateStatus)
     UpdateStatus()
 
-    y = y - 140
+    y = y - 124
 
     -- Settings rows ---------------------------------------------------------
     local function EnabledGet() return Addon.GetConfig().enabled end
@@ -648,7 +671,7 @@ end)
 local function CreateInterfaceOptionsPanel()
     local panel = CreateFrame("Frame", "Tate_ASQ_InterfaceOptions", UIParent)
     panel.name = L("Spell Queue")
-    panel:SetSize(520, 580)
+    panel:SetSize(520, 470)
 
     -- Build rows on first open, not at login: keeps memory minimal until the
     -- standard options page is actually used.
