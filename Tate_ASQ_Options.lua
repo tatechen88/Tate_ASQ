@@ -377,14 +377,32 @@ local function BuildSettings(frame, showTitle)
         return value
     end
 
-    local lineSpec = AddStatusLine(0, L("Role") .. " / " .. L("Spec"))
-    local lineBase = AddStatusLine(1, L("Base Value"))
-    local lineLat = AddStatusLine(2, L("Current Latency"))
-    local lineCur = AddStatusLine(3, L("Current SpellQueueWindow"))
-    local lineTarget = AddStatusLine(4, L("Last Target"))
+    local lineFormula = AddStatusLine(0, L("Formula"))
+    local lineSpec = AddStatusLine(1, L("Role") .. " / " .. L("Spec"))
+    local lineBase = AddStatusLine(2, L("Base Value"))
+    local lineLat = AddStatusLine(3, L("Current Latency"))
+    local lineCur = AddStatusLine(4, L("Current SpellQueueWindow"))
 
     local function UpdateStatus()
+        local cfg = Addon.GetConfig()
         local state = Addon.last or {}
+
+        -- Formula line: show exactly how the target is derived.
+        if state.target then
+            local pending = state.pending and ("  [" .. L("Pending (combat)") .. "]") or ""
+            if cfg.adaptive ~= false and state.latency then
+                lineFormula:SetText(("%d ms = max(%s %d, %s %d + %d)"):format(
+                    state.target,
+                    L("Base Value"), state.base or 0,
+                    L("Latency"), Round(state.latency), cfg.margin or 50) .. pending)
+            else
+                lineFormula:SetText(("%d ms = %s %d"):format(
+                    state.target, L("Base Value"), state.base or 0) .. pending)
+            end
+        else
+            lineFormula:SetText("--")
+        end
+
         local role = state.role and L(state.role) or L("Unknown")
         local specID = state.specID or 0
         lineSpec:SetText(role .. " / " .. specID)
@@ -398,13 +416,6 @@ local function BuildSettings(frame, showTitle)
         local cur, home, world = Addon.GetLiveStatus()
         lineLat:SetText(L("Home") .. " " .. Round(home or 0) .. " / " .. L("World") .. " " .. Round(world or 0) .. " ms")
         lineCur:SetText(cur .. " ms")
-
-        if state.target then
-            local pending = state.pending and ("  [" .. L("Pending (combat)") .. "]") or ""
-            lineTarget:SetText(state.target .. " ms" .. pending)
-        else
-            lineTarget:SetText("--")
-        end
     end
     AddRowUpdater(UpdateStatus)
     UpdateStatus()
