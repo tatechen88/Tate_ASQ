@@ -521,12 +521,12 @@ local function CreateStatusBar()
     bar:RegisterForDrag("LeftButton")
     bar:SetClampedToScreen(true)
 
-    -- Restore saved position (same anchor point used when saving), default top-center.
+    -- Restore saved position (TOPLEFT offsets relative to UIParent), default top-center.
     local cfg = Addon.GetConfig()
     local pos = cfg.statusBarPos
     bar:ClearAllPoints()
-    if type(pos) == "table" and pos.point and type(pos.x) == "number" and type(pos.y) == "number" then
-        bar:SetPoint(pos.point, UIParent, pos.relativePoint or pos.point, pos.x, pos.y)
+    if type(pos) == "table" and type(pos.x) == "number" and type(pos.y) == "number" then
+        bar:SetPoint("TOPLEFT", UIParent, "TOPLEFT", pos.x, pos.y)
     else
         bar:SetPoint("TOP", UIParent, "TOP", 0, -120)
     end
@@ -547,17 +547,14 @@ local function CreateStatusBar()
     bar:SetScript("OnDragStart", function(self) self._dragging = true; self:StartMoving() end)
     bar:SetScript("OnDragStop", function(self)
         self:StopMovingOrSizing()
-        -- Remember the exact anchor point and offsets; ClampedToScreen keeps
-        -- the frame inside the screen while dragging.
-        local point, relativeTo, relativePoint, x, y = self:GetPoint(1)
-        if point and relativeTo == UIParent and x and y then
+        -- Save as TOPLEFT offsets relative to UIParent, clamped to screen.
+        local left = self:GetLeft()
+        local top = self:GetTop()
+        if left and top and UIParent then
+            local x = Clamp(left, 0, UIParent:GetWidth() - self:GetWidth())
+            local y = Clamp(top - UIParent:GetTop(), -(UIParent:GetHeight() - self:GetHeight()), 0)
             local db = Addon.GetConfig()
-            db.statusBarPos = {
-                point = point,
-                relativePoint = relativePoint or point,
-                x = x,
-                y = y,
-            }
+            db.statusBarPos = { x = x, y = y }
         end
     end)
     bar:SetScript("OnMouseUp", function(self, button)
