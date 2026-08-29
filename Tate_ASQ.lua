@@ -62,6 +62,7 @@ local LOCALES = {
         ["Auto SpellQueue"] = "自动施法容错",
         ["Pending (combat)"] = "等待脱战",
         ["Open Settings"] = "打开设置",
+        ["Drag to move"] = "拖动可移动",
         ["Close"] = "关闭",
     },
     zhTW = {
@@ -103,6 +104,7 @@ local LOCALES = {
         ["Auto SpellQueue"] = "自動施法容錯",
         ["Pending (combat)"] = "等待脫戰",
         ["Open Settings"] = "開啟設定",
+        ["Drag to move"] = "拖曳可移動",
         ["Close"] = "關閉",
     },
 }
