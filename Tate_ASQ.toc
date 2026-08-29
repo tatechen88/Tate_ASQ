@@ -1,0 +1,14 @@
+## Interface: 120000, 120001, 120005, 120007, 120100
+## Title: |cff0cd29fTate's AutoSpellQueue|r
+## Notes: Tate's AutoSpellQueue - auto SpellQueueWindow by class/spec and latency.
+## Author: tatechen88
+## Version: 1.0.0
+## SavedVariables: Tate_ASQDB
+## IconTexture: Interface\Icons\INV_Misc_QuestionMark
+## AddonCompartmentFunc: Tate_ASQ_OnCompartmentClick
+## AddonCompartmentFuncOnEnter: Tate_ASQ_OnCompartmentEnter
+## AddonCompartmentFuncOnLeave: Tate_ASQ_OnCompartmentLeave
+
+Tate_ASQ_Formula.lua
+Tate_ASQ.lua
+Tate_ASQ_Options.lua

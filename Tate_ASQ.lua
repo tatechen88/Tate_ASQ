@@ -1,7 +1,7 @@
-if _G.EUI_CLIENT_BLOCKED then return end -- pre-12.1 client failsafe (EllesmereUI_ClientGate.lua)
+if _G.EUI_CLIENT_BLOCKED then return end -- pre-12.1 client failsafe (set by EllesmereUI when present)
 
 -------------------------------------------------------------------------------
---  EllesmereUI_AutoSpellQueue.lua
+--  Tate_ASQ.lua
 --  Runtime: reads config, watches login/spec events, applies SpellQueueWindow.
 --  No periodic sampling by design -- evaluation only happens on:
 --    PLAYER_ENTERING_WORLD
@@ -10,13 +10,13 @@ if _G.EUI_CLIENT_BLOCKED then return end -- pre-12.1 client failsafe (EllesmereU
 -------------------------------------------------------------------------------
 local ADDON_NAME, ns = ...
 
-local Addon = _G.EllesmereUI_AutoSpellQueue or {}
-_G.EllesmereUI_AutoSpellQueue = Addon
+local Addon = _G.Tate_ASQ or {}
+_G.Tate_ASQ = Addon
 
-local Formula = _G.EllesmereUI_AutoSpellQueueFormula
+local Formula = _G.Tate_ASQFormula
 
 ---------------------------------------------------------------------------
---  Localisation (self-contained; does not modify EllesmereUI locale files)
+--  Localisation (self-contained)
 ---------------------------------------------------------------------------
 local L = function(key)
     return key
@@ -133,10 +133,10 @@ local DEFAULTS = {
 }
 
 local function GetConfig()
-    local db = _G.EllesmereUI_AutoSpellQueueDB
+    local db = _G.Tate_ASQDB
     if type(db) ~= "table" then
         db = {}
-        _G.EllesmereUI_AutoSpellQueueDB = db
+        _G.Tate_ASQDB = db
     end
     for k, v in pairs(DEFAULTS) do
         if db[k] == nil then db[k] = v end
@@ -332,13 +332,13 @@ end)
 ---------------------------------------------------------------------------
 --  Addon compartment entry points (declared in the TOC)
 ---------------------------------------------------------------------------
-function EllesmereUI_AutoSpellQueue_OnCompartmentClick(addonName, buttonName)
-    if _G.EllesmereUI_AutoSpellQueueOptions then
-        _G.EllesmereUI_AutoSpellQueueOptions.Toggle()
+function Tate_ASQ_OnCompartmentClick(addonName, buttonName)
+    if _G.Tate_ASQOptions then
+        _G.Tate_ASQOptions.Toggle()
     end
 end
 
-function EllesmereUI_AutoSpellQueue_OnCompartmentEnter(addonName, button)
+function Tate_ASQ_OnCompartmentEnter(addonName, button)
     if button and MenuUtil and MenuUtil.ShowTooltip then
         MenuUtil.ShowTooltip(button, function(tooltip)
             tooltip:SetText(L("Spell Queue"))
@@ -347,7 +347,7 @@ function EllesmereUI_AutoSpellQueue_OnCompartmentEnter(addonName, button)
     end
 end
 
-function EllesmereUI_AutoSpellQueue_OnCompartmentLeave(addonName, button)
+function Tate_ASQ_OnCompartmentLeave(addonName, button)
     if button and MenuUtil and MenuUtil.HideTooltip then
         MenuUtil.HideTooltip(button)
     end

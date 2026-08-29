@@ -1,18 +1,16 @@
-if _G.EUI_CLIENT_BLOCKED then return end -- pre-12.1 client failsafe (EllesmereUI_ClientGate.lua)
+if _G.EUI_CLIENT_BLOCKED then return end -- pre-12.1 client failsafe (set by EllesmereUI when present)
 
 -------------------------------------------------------------------------------
---  EllesmereUI_AutoSpellQueue_Options.lua
---  Standalone settings window + movable status bar.
---  Deliberately does NOT modify EllesmereUI: the addon lives next to it in
---  Interface\AddOns and only depends on it being loaded.
+--  Tate_ASQ_Options.lua
+--  Standalone settings window + movable status bar. Does not depend on other addons.
 -------------------------------------------------------------------------------
-local Addon = _G.EllesmereUI_AutoSpellQueue
+local Addon = _G.Tate_ASQ
 if not Addon then return end
 
 local L = Addon.L
 
 ---------------------------------------------------------------------------
---  Visual constants (EUII-ish dark panel + teal accent)
+--  Visual constants (dark panel + teal accent)
 ---------------------------------------------------------------------------
 local ACCENT_R, ACCENT_G, ACCENT_B = 12/255, 210/255, 157/255
 local BG_R, BG_G, BG_B, BG_A = 0.05, 0.07, 0.09, 0.97
@@ -21,7 +19,7 @@ local TEXT_R, TEXT_G, TEXT_B = 1, 1, 1
 local DIM_R, DIM_G, DIM_B, DIM_A = 1, 1, 1, 0.55
 
 local Options = {}
-_G.EllesmereUI_AutoSpellQueueOptions = Options
+_G.Tate_ASQOptions = Options
 
 ---------------------------------------------------------------------------
 --  Helpers
@@ -96,7 +94,7 @@ local function AddRowUpdater(fn)
 end
 
 local function CreatePanelFrame()
-    local frame = CreateFrame("Frame", "EllesmereUI_AutoSpellQueueSettings", UIParent)
+    local frame = CreateFrame("Frame", "Tate_ASQ_Settings", UIParent)
     frame:SetSize(460, 540)
     frame:SetPoint("CENTER")
     frame:SetFrameStrata("DIALOG")
@@ -471,7 +469,7 @@ end
 local statusBar
 
 local function CreateStatusBar()
-    local bar = CreateFrame("Frame", "EllesmereUI_AutoSpellQueueStatusBar", UIParent)
+    local bar = CreateFrame("Frame", "Tate_ASQ_StatusBar", UIParent)
     bar:SetSize(90, 26)
     bar:SetPoint("TOP", UIParent, "TOP", 0, -120)
     bar:SetFrameStrata("MEDIUM")
@@ -613,7 +611,7 @@ end
 --  Standard Interface Options entry (Options -> AddOns)
 ---------------------------------------------------------------------------
 local function CreateInterfaceOptionsPanel()
-    local panel = CreateFrame("Frame", "EllesmereUI_AutoSpellQueueInterfaceOptions", UIParent)
+    local panel = CreateFrame("Frame", "Tate_ASQ_InterfaceOptions", UIParent)
     panel.name = L("Spell Queue")
     panel:SetSize(520, 540)
 

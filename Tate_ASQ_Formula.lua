@@ -1,14 +1,14 @@
-if _G.EUI_CLIENT_BLOCKED then return end -- pre-12.1 client failsafe (EllesmereUI_ClientGate.lua)
+if _G.EUI_CLIENT_BLOCKED then return end -- pre-12.1 client failsafe (set by EllesmereUI when present)
 
 -------------------------------------------------------------------------------
---  EllesmereUI_AutoSpellQueue_Formula.lua
+--  Tate_ASQ_Formula.lua
 --  Pure calculation module. No frames, no events, no CVar writes, no UI.
 --  Everything that decides "what value should SpellQueueWindow have" lives here.
 -------------------------------------------------------------------------------
 local ADDON_NAME, ns = ...
 
 local Formula = {}
-_G.EllesmereUI_AutoSpellQueueFormula = Formula
+_G.Tate_ASQFormula = Formula
 
 ---------------------------------------------------------------------------
 --  Role classification tables
