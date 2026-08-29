@@ -1,73 +1,135 @@
 # Tate_ASQ
 
-Tate's AutoSpellQueue — 魔兽世界正式服（12.x）插件：根据当前职业/专精与网络延迟，自动调整 `SpellQueueWindow`（施法队列窗口 / 施法容错）。
+**Tate's AutoSpellQueue** — 魔兽世界正式服（12.x）插件。
 
-独立插件，不依赖 EllesmereUI。可与 EllesmereUI 并存，但不会修改其本体，也不会受其更新影响。
+**By Tate Chen**
 
-## 特性
+自动根据职业/专精、网络延迟与当前场景，调整 `SpellQueueWindow`（施法队列窗口 / 施法容错）。
+
+---
+
+## 这是什么？为什么有用？
+
+魔兽的「施法队列窗口」决定：**你可以在当前技能/GCD 结束前多少毫秒预输入下一个技能**。
+
+- 值太小：网络稍有延迟，技能之间容易断档，损失输出。
+- 值太大：技能会「太黏」，容易把不该排的技能排进去，近战尤其明显。
+
+暴雪默认值是 400ms，对多数人偏高。Tate_ASQ 会根据职业/专精和当前网络，帮你自动设到更合适的值。
+
+---
+
+## 工作原理
+
+### 1. 职业/专精基础值
+
+插件内置一张草表（`Tate_ASQ_Formula.lua`），按职业/专精给基础值。原则：
+
+- 高 APM 近战 / 连击点职业（盗贼、踏风）：140ms 左右，保持反应速度。
+- 标准近战（战士、惩戒等）：150ms。
+- 坦克（防战、血 DK 等）：160ms，稍微方便排减伤。
+- 远程瞬发（兽王猎）：190ms。
+- 读条法系（火法、毁灭术等）：240ms 左右，保证读条衔接。
+- 其他远程/治疗：介于中间。
+
+### 2. 网络延迟自适应
+
+插件读取 `GetNetStats()` 的 **World（世界/战斗服务器）延迟**：
+
+```
+延迟需求 = World延迟 + 50ms 余量
+最终值   = clamp( max(职业基础值, 延迟需求), 50, 400 )
+```
+
+- 网络好：延迟需求低于基础值 → 用基础值。
+- 网络差：延迟需求超过基础值 → 用延迟算出的更高值。
+- World 延迟不可用时，回退使用 Home 延迟。
+
+### 3. 城市 / 副本不同算法
+
+| 场景 | 计算方式 | 原因 |
+|---|---|---|
+| 城市（安全区） | 直接用职业基础值 | 城市里没有战斗，不需要追延迟 |
+| 副本 / 团本 | 基础值 + 延迟自适应 | 战斗强度最高，保证技能不断档 |
+| 野外 | 基础值 + 延迟自适应 | 可能发生战斗/PvP |
+
+判断方式：
+
+- 副本/团本：`IsInInstance()`
+- 城市：`C_Map.GetMapInfo` 的 `IsCityMap` 标记
+- 其余视为野外
+
+### 4. 什么时候会重新计算并写入
+
+- 进入游戏（`PLAYER_ENTERING_WORLD`）
+- 切换专精/天赋（`PLAYER_SPECIALIZATION_CHANGED`）
+- 场景变化，例如进出副本、进出城市（`ZONE_CHANGED_NEW_AREA`）
+- 在设置页手动修改配置
+
+没有定时器，不做周期性覆盖。战斗中触发的写入会推迟到脱战。
+
+---
+
+## 主要功能
 
 - 默认启用。
-- 仅在**进入游戏**与**切换专精（天赋）**时自动判定并写入；无定时器，不周期覆盖。
-- 基础值按职业/专精差异化（例如盗贼 140ms、战士 150ms、兽王猎 190ms、火法 245ms 等），而非单一近战/远程数值。
-- 延迟自适应：`最终值 = clamp(max(职业基础值, 当前延迟 + 50), 50, 400)`。
-- 城市 / 副本不同算法：
-  - **城市**：直接使用职业/专精基础值，不追延迟。
-  - **副本 / 野外**：使用基础值 + 延迟自适应。
-- 延迟来源固定为 `world`（世界/战斗服务器延迟；World 不可用时回退 Home），不显示在界面上。
-- 设置项变更立即生效（用户操作触发）。
-- 悬浮状态条只显示当前 `SpellQueueWindow` 值，可拖动；左键点击打开设置。
-- 状态条字体可选（WoW 内置字体 / LibSharedMedia 字体），字号 10–20，状态条会随字号自动缩放。
-- 中英文自动切换（zhCN / zhTW / enUS，英文为默认兜底）。
-- 没有 slash 命令。
+- 基础值模式：
+  - **自动**：按职业/专精表。
+  - **手动**：使用你指定的固定基础值。
+- 延迟自适应可开关。
+- 悬浮状态条只显示当前 `SpellQueueWindow` 值，可拖动，左键点击打开设置。
+- 状态条字体可选（WoW 内置 / LibSharedMedia，若存在），字号可调，状态条随字号自动缩放。
+- 设置页顶部显示**计算式**，让你知道当前值是怎么来的。
+- 中英文自动切换（zhCN / zhTW / 英文兜底）。
+- 关闭插件时，若当前值仍是本插件最后写入的值，会恢复启用前的旧值。
 
-## 安装
-
-1. 下载并解压到 `World of Warcraft\_retail_\Interface\AddOns\`，确保文件夹名为 `Tate_ASQ`。
-2. 进入游戏，插件会自动启用并应用第一次计算。
+---
 
 ## 设置入口
 
 - 游戏菜单 → 选项 → 插件 → 施法容错。
 - 悬浮状态条左键点击。
 
-## 设置项
+---
 
-- 启用 / 关闭
-- 基础值模式：自动（按职业/专精表）或手动
-- 手动基础值
-- 延迟自适应开关
-- 状态条字体 / 字号
+## 安装
+
+1. 下载并解压到 `World of Warcraft\_retail_\Interface\AddOns\`，确保文件夹名为 `Tate_ASQ`。
+2. 进入游戏，插件会自动启用。
+
+---
 
 ## 默认参数
 
-| 参数 | 默认值 |
-|---|---|
-| enabled | true |
-| baseMode | auto |
-| manualBase | 200 |
-| adaptive | true |
-| latencySource | world |
-| margin | 50 |
-| minWindow | 50 |
-| maxWindow | 400 |
-| hysteresis | 10 |
-| showStatus | true |
-| statusFont | Fonts\FRIZQT__.TTF |
-| statusFontSize | 12 |
+| 参数 | 默认值 | 说明 |
+|---|---|---|
+| enabled | true | 总开关 |
+| baseMode | auto | auto = 职业/专精表；manual = 手动 |
+| manualBase | 200 | 手动模式基础值 |
+| adaptive | true | 是否叠加延迟自适应 |
+| latencySource | world | 固定世界延迟，World 不可用时回退 Home |
+| margin | 50 | 延迟余量 |
+| minWindow | 50 | 最终值下限 |
+| maxWindow | 400 | 最终值上限 |
+| hysteresis | 10 | 写入迟滞 |
+| showStatus | true | 显示悬浮状态条 |
+| statusFont | Fonts\FRIZQT__.TTF | 状态条字体 |
+| statusFontSize | 12 | 状态条字号 |
 
-## 计算逻辑
+---
 
-计算逻辑独立在 `Tate_ASQ_Formula.lua`，不碰 CVar、事件与 UI：
+## 文件结构
 
-- `Classify(specID, classFile)` → 近战 / 远程
-- `GetBase(cfg, specID, classFile)` → 职业/专精基础值
-- `PickLatency(source, home, world)` → 选择延迟
-- `ComputeTarget(cfg, specID, classFile, home, world)` → 最终目标值
+```
+Tate_ASQ.toc
+Tate_ASQ_Formula.lua    -- 纯计算：职业/专精基础值 + 延迟 + 场景
+Tate_ASQ.lua            -- 运行时：事件、CVar 读写、恢复逻辑
+Tate_ASQ_Options.lua    -- 设置窗口、状态条、标准选项页
+```
 
-职业/专精基础值草表可在该文件顶部调整。
+---
 
 ## 注意
 
-- `GetNetStats()` 的延迟值约 30 秒才刷新一次；因此延迟变化后，最长约 30 秒才能在下一次进入游戏/切专精时体现到计算中。
-- 战斗中触发的写入会推迟到脱战。
-- 关闭插件时，若当前值仍是本插件最后写入的值，会恢复到启用前的旧值。
+- `GetNetStats()` 约 30 秒才更新一次；延迟变化后，最长约 30 秒才能在下一次重算时体现。
+- 职业/专精基础值草表可在 `Tate_ASQ_Formula.lua` 顶部调整。

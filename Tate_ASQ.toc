@@ -1,7 +1,7 @@
 ## Interface: 120000, 120001, 120005, 120007, 120100
 ## Title: |cff0cd29fTate's AutoSpellQueue|r
-## Notes: Tate's AutoSpellQueue - auto SpellQueueWindow by class/spec and latency.
-## Author: tatechen88
+## Notes: By Tate Chen - auto SpellQueueWindow by class/spec and latency.
+## Author: Tate Chen
 ## Version: 1.0.0
 ## SavedVariables: Tate_ASQDB
 ## IconTexture: Interface\Icons\INV_Misc_QuestionMark

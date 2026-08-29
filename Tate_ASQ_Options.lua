@@ -423,7 +423,12 @@ local function BuildSettings(frame, showTitle)
             lineFormula:SetText("--")
         end
 
-        local role = state.role and L(state.role) or L("Unknown")
+        local role = L("Unknown")
+        if state.role == "melee" then
+            role = L("Melee")
+        elseif state.role == "ranged" then
+            role = L("Ranged")
+        end
         local specID = state.specID or 0
         lineSpec:SetText(role .. " / " .. specID .. " / " .. ContextLabel(state.context))
 
@@ -490,7 +495,7 @@ local function BuildSettings(frame, showTitle)
     note:SetFontObject(GameFontNormalSmall)
     note:SetJustifyH("CENTER")
     AddRowUpdater(function()
-        note:SetText("|cff0cd29d" .. L("Auto SpellQueue") .. "|r  " .. L("Enabled") .. ": " .. (Addon.GetConfig().enabled and L("On") or L("Off")))
+        note:SetText("|cff0cd29d" .. L("Auto SpellQueue") .. "|r  |  By Tate Chen  |  " .. L("Enabled") .. ": " .. (Addon.GetConfig().enabled and L("On") or L("Off")))
     end)
 
     -- Apply all row updaters immediately so hidden/disabled states and values
