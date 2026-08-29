@@ -495,7 +495,7 @@ local function BuildSettings(frame, showTitle)
     note:SetFontObject(GameFontNormalSmall)
     note:SetJustifyH("CENTER")
     AddRowUpdater(function()
-        note:SetText("|cff0cd29d" .. L("Auto SpellQueue") .. "|r  |  By Tate Chen  |  " .. L("Enabled") .. ": " .. (Addon.GetConfig().enabled and L("On") or L("Off")))
+        note:SetText("|cff0cd29d" .. L("Auto SpellQueue") .. "|r  |  By Tate@螺丝仙境  |  " .. L("Enabled") .. ": " .. (Addon.GetConfig().enabled and L("On") or L("Off")))
     end)
 
     -- Apply all row updaters immediately so hidden/disabled states and values
