@@ -2,7 +2,7 @@
 ## Title: |cff0cd29fTate's AutoSpellQueue|r
 ## Notes: By Tate Chen - auto SpellQueueWindow by class/spec and latency.
 ## Author: Tate Chen
-## Version: 1.0.0
+## Version: 1.0.1
 ## SavedVariables: Tate_ASQDB
 ## IconTexture: Interface\Icons\INV_Misc_QuestionMark
 
