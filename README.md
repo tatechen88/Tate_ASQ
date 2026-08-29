@@ -94,8 +94,9 @@
 
 ## 安装
 
-1. 下载并解压到 `World of Warcraft\_retail_\Interface\AddOns\`，确保文件夹名为 `Tate_ASQ`。
-2. 进入游戏，插件会自动启用。
+1. 下载最新版：[Tate_ASQ-v1.0.0.zip](https://github.com/tatechen88/Tate_ASQ/releases/download/v1.0.0/Tate_ASQ-v1.0.0.zip)
+2. 解压后把 `Tate_ASQ` 文件夹放到 `World of Warcraft\_retail_\Interface\AddOns\`。
+3. 进入游戏，插件会自动启用。
 
 ---
 
