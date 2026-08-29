@@ -180,7 +180,7 @@ local function AddToggleRow(frame, y, labelText, get, set)
 
     local function Update()
         local v = get()
-        btn._text:SetText(v and "On" or "Off")
+        btn._text:SetText(v and L("On") or L("Off"))
         btn._text:SetTextColor(v and 0 or TEXT_R, v and 0 or TEXT_G, v and 0 or TEXT_B, 1)
         btn._bg:SetColorTexture(v and ACCENT_R or 0.10, v and ACCENT_G or 0.13, v and ACCENT_B or 0.16, 0.9)
     end
@@ -397,7 +397,7 @@ local function BuildSettings()
     note:SetFontObject(GameFontNormalSmall)
     note:SetJustifyH("CENTER")
     AddRowUpdater(function()
-        note:SetText("|cff0cd29d" .. L("Auto SpellQueue") .. "|r  " .. L("Enabled") .. ": " .. (Addon.GetConfig().enabled and "On" or "Off"))
+        note:SetText("|cff0cd29d" .. L("Auto SpellQueue") .. "|r  " .. L("Enabled") .. ": " .. (Addon.GetConfig().enabled and L("On") or L("Off")))
     end)
 end
 
