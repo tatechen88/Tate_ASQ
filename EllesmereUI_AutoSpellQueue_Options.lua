@@ -97,7 +97,7 @@ end
 
 local function CreatePanelFrame()
     local frame = CreateFrame("Frame", "EllesmereUI_AutoSpellQueueSettings", UIParent)
-    frame:SetSize(460, 440)
+    frame:SetSize(460, 540)
     frame:SetPoint("CENTER")
     frame:SetFrameStrata("DIALOG")
     frame:EnableMouse(true)
@@ -264,11 +264,12 @@ end
 ---------------------------------------------------------------------------
 --  Window content
 ---------------------------------------------------------------------------
-local function BuildSettings()
-    local frame = settingsFrame
-    CreateTitleBar(frame)
+local function BuildSettings(frame, showTitle)
+    if showTitle then
+        CreateTitleBar(frame)
+    end
 
-    local y = -54
+    local y = showTitle and -54 or -16
     local rowH = 44
 
     -- Status block ----------------------------------------------------------
@@ -351,6 +352,25 @@ local function BuildSettings()
     local function AdaptiveSet(v) Addon.SetConfig("adaptive", v) end
     AddToggleRow(frame, y, L("Adaptive by latency"), AdaptiveGet, AdaptiveSet); y = y - rowH
 
+    local fontEntries = {
+        { value = "small",  label = "Small" },
+        { value = "normal", label = "Normal" },
+        { value = "large",  label = "Large" },
+    }
+    local function FontGet() return Addon.GetConfig().statusFont end
+    local function FontSet(v)
+        Addon.SetConfig("statusFont", v, true)
+        Options.ApplyStatusBarStyle()
+    end
+    AddCycleRow(frame, y, L("Status Bar Font"), fontEntries, FontGet, FontSet); y = y - rowH
+
+    local function FontSizeGet() return Addon.GetConfig().statusFontSize end
+    local function FontSizeSet(v)
+        Addon.SetConfig("statusFontSize", v, true)
+        Options.ApplyStatusBarStyle()
+    end
+    AddStepperRow(frame, y, L("Status Bar Font Size"), 10, 20, 1, FontSizeGet, FontSizeSet); y = y - rowH
+
     -- Manual base row visibility -------------------------------------------
     AddRowUpdater(function()
         local show = Addon.GetConfig().baseMode == "manual"
@@ -388,9 +408,8 @@ local function CreateStatusBar()
     AddBorder(bar, ACCENT_R, ACCENT_G, ACCENT_B, 0.6)
 
     local text = CreateText(bar)
-    text:SetPoint("LEFT", 10, 0)
-    text:SetFontObject(GameFontNormalSmall)
-    SetLabel(text, "SQW --")
+    text:SetPoint("CENTER", 0, 0)
+    SetLabel(text, "-- ms")
 
     bar._text = text
     bar._dragging = false
@@ -408,10 +427,29 @@ local function CreateStatusBar()
     return bar
 end
 
+function Options.ApplyStatusBarStyle()
+    if not statusBar or not statusBar._text then return end
+    local cfg = Addon.GetConfig()
+    local fontKey = cfg.statusFont or "small"
+    local fontObj = GameFontNormalSmall
+    if fontKey == "normal" then
+        fontObj = GameFontNormal
+    elseif fontKey == "large" then
+        fontObj = GameFontNormalLarge
+    end
+    local fontPath, _, flags = fontObj:GetFont()
+    if fontPath then
+        statusBar._text:SetFont(fontPath, cfg.statusFontSize or 12, flags or "")
+    else
+        statusBar._text:SetFontObject(fontObj)
+    end
+end
+
 function Options.UpdateStatusBar()
     local cfg = Addon.GetConfig()
     if cfg.showStatus then
         if not statusBar then statusBar = CreateStatusBar() end
+        Options.ApplyStatusBarStyle()
         statusBar:Show()
     elseif statusBar then
         statusBar:Hide()
@@ -432,7 +470,7 @@ local elapsedAccum = 0
 function Options.Toggle()
     if not settingsFrame then
         settingsFrame = CreatePanelFrame()
-        BuildSettings()
+        BuildSettings(settingsFrame, true)
     end
     if settingsFrame:IsShown() then
         settingsFrame:Hide()
@@ -465,6 +503,55 @@ statusUpdateFrame:SetScript("OnUpdate", function(self, elapsed)
 end)
 
 ---------------------------------------------------------------------------
+--  Minimap button (direct, reliable fallback in addition to AddonCompartment)
+---------------------------------------------------------------------------
+local minimapButton
+
+local function CreateMinimapButton()
+    if minimapButton then return minimapButton end
+
+    local parent = Minimap or UIParent
+    minimapButton = CreateActionButton(parent, 28, 28)
+    if Minimap then
+        minimapButton:SetPoint("BOTTOMLEFT", Minimap, "BOTTOMLEFT", 4, 4)
+    else
+        minimapButton:SetPoint("TOPRIGHT", UIParent, "TOPRIGHT", -220, -30)
+    end
+    minimapButton:SetFrameStrata("MEDIUM")
+    minimapButton._text:SetText("SQ")
+    minimapButton._text:SetFontObject(GameFontNormalSmall)
+    minimapButton:SetScript("OnClick", function() Options.Toggle() end)
+    minimapButton:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:SetText(L("Spell Queue"), 1, 1, 1)
+        GameTooltip:AddLine(L("Open Settings"), 1, 1, 1, true)
+        GameTooltip:Show()
+    end)
+    minimapButton:SetScript("OnLeave", function() GameTooltip:Hide() end)
+
+    return minimapButton
+end
+
+---------------------------------------------------------------------------
+--  Standard Interface Options entry (Options -> AddOns)
+---------------------------------------------------------------------------
+local function CreateInterfaceOptionsPanel()
+    local panel = CreateFrame("Frame", "EllesmereUI_AutoSpellQueueInterfaceOptions", UIParent)
+    panel.name = L("Spell Queue")
+    panel:SetSize(520, 540)
+
+    BuildSettings(panel, false)
+
+    if Settings and Settings.RegisterCanvasLayoutCategory and Settings.RegisterAddOnCategory then
+        local category = Settings.RegisterCanvasLayoutCategory(panel, panel.name, panel.name)
+        category.ID = panel.name
+        Settings.RegisterAddOnCategory(category)
+    elseif InterfaceOptions_AddCategory then
+        InterfaceOptions_AddCategory(panel)
+    end
+end
+
+---------------------------------------------------------------------------
 --  Init
 ---------------------------------------------------------------------------
 do
@@ -474,5 +561,7 @@ do
         self:UnregisterEvent("PLAYER_LOGIN")
         if not Addon.loaded then return end
         Options.UpdateStatusBar()
+        CreateMinimapButton()
+        CreateInterfaceOptionsPanel()
     end)
 end

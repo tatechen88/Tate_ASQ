@@ -51,6 +51,11 @@ local LOCALES = {
         ["Manual Base"] = "手动基础值",
         ["Adaptive by latency"] = "依延迟自动调整",
         ["Show Status Bar"] = "显示状态条",
+        ["Status Bar Font"] = "状态条字体",
+        ["Status Bar Font Size"] = "状态条字号",
+        ["Small"] = "小",
+        ["Normal"] = "普通",
+        ["Large"] = "大",
         ["Spell Queue"] = "施法容错",
         ["Auto SpellQueue"] = "自动施法容错",
         ["Pending (combat)"] = "等待脱战",
@@ -85,6 +90,11 @@ local LOCALES = {
         ["Manual Base"] = "手動基礎值",
         ["Adaptive by latency"] = "依延遲自動調整",
         ["Show Status Bar"] = "顯示狀態列",
+        ["Status Bar Font"] = "狀態列字體",
+        ["Status Bar Font Size"] = "狀態列字號",
+        ["Small"] = "小",
+        ["Normal"] = "普通",
+        ["Large"] = "大",
         ["Spell Queue"] = "施法容錯",
         ["Auto SpellQueue"] = "自動施法容錯",
         ["Pending (combat)"] = "等待脫戰",
@@ -118,6 +128,8 @@ local DEFAULTS = {
     maxWindow     = 400,
     hysteresis    = 10,
     showStatus    = true,
+    statusFont    = "small",   -- "small" | "normal" | "large"
+    statusFontSize = 12,
 }
 
 local function GetConfig()
@@ -270,10 +282,10 @@ function Addon.SetEnabled(v)
     end
 end
 
-function Addon.SetConfig(key, value)
+function Addon.SetConfig(key, value, noRecalc)
     local cfg = GetConfig()
     cfg[key] = value
-    if cfg.enabled then
+    if cfg.enabled and not noRecalc then
         Addon.Evaluate(true)
     end
 end
