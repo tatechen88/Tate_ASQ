@@ -409,6 +409,7 @@ local function CreateStatusBar()
 
     local text = CreateText(bar)
     text:SetPoint("CENTER", 0, 0)
+    text:SetFontObject(GameFontNormalSmall)
     SetLabel(text, "-- ms")
 
     bar._text = text
