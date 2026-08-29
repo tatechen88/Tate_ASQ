@@ -515,12 +515,21 @@ local statusBar
 local function CreateStatusBar()
     local bar = CreateFrame("Frame", "Tate_ASQ_StatusBar", UIParent)
     bar:SetSize(90, 26)
-    bar:SetPoint("TOP", UIParent, "TOP", 0, -120)
     bar:SetFrameStrata("MEDIUM")
     bar:EnableMouse(true)
     bar:SetMovable(true)
     bar:RegisterForDrag("LeftButton")
     bar:SetClampedToScreen(true)
+
+    -- Restore saved position, default to top-center.
+    local cfg = Addon.GetConfig()
+    local pos = cfg.statusBarPos
+    bar:ClearAllPoints()
+    if type(pos) == "table" and type(pos.x) == "number" and type(pos.y) == "number" then
+        bar:SetPoint("TOPLEFT", UIParent, "TOPLEFT", pos.x, pos.y)
+    else
+        bar:SetPoint("TOP", UIParent, "TOP", 0, -120)
+    end
 
     local bg = CreateTexture(bar)
     SetColor(bg, 0.02, 0.03, 0.04, 0.86)
@@ -536,7 +545,16 @@ local function CreateStatusBar()
 
     bar:SetScript("OnMouseDown", function(self) self._dragging = false end)
     bar:SetScript("OnDragStart", function(self) self._dragging = true; self:StartMoving() end)
-    bar:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
+    bar:SetScript("OnDragStop", function(self)
+        self:StopMovingOrSizing()
+        -- Remember position (TOPLEFT relative to UIParent). ClampedToScreen
+        -- keeps it inside the screen while dragging.
+        local point, relativeTo, _, x, y = self:GetPoint(1)
+        if point and relativeTo == UIParent and x and y then
+            local db = Addon.GetConfig()
+            db.statusBarPos = { x = x, y = y }
+        end
+    end)
     bar:SetScript("OnMouseUp", function(self, button)
         if button == "LeftButton" and not self._dragging then
             Options.Toggle()
