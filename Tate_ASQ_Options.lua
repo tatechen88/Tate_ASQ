@@ -187,7 +187,10 @@ local function ResolveFontPath(value)
     return "Fonts\\FRIZQT__.TTF"
 end
 
+local fontListCache
+
 local function GetFontList()
+    if fontListCache then return fontListCache end
     local list = {
         { value = "Fonts\\FRIZQT__.TTF",    label = "Friz Quadrata (Default)" },
         { value = "Fonts\\ARIALN.TTF",       label = "Arial Narrow" },
@@ -204,6 +207,7 @@ local function GetFontList()
             end
         end
     end
+    fontListCache = list
     return list
 end
 
@@ -591,13 +595,7 @@ function Options.Toggle()
         settingsFrame:Hide()
     else
         settingsFrame:Show()
-        UpdateRows()
     end
-end
-
-function Options.RefreshStatus()
-    UpdateRows()
-    UpdateStatusBarText()
 end
 
 ---------------------------------------------------------------------------
@@ -625,8 +623,16 @@ local function CreateInterfaceOptionsPanel()
     panel.name = L("Spell Queue")
     panel:SetSize(520, 540)
 
-    BuildSettings(panel, false)
-    panel:SetScript("OnShow", function() UpdateRows() end)
+    -- Build rows on first open, not at login: keeps memory minimal until the
+    -- standard options page is actually used.
+    local built = false
+    panel:SetScript("OnShow", function()
+        if not built then
+            BuildSettings(panel, false)
+            built = true
+        end
+        UpdateRows()
+    end)
 
     if Settings and Settings.RegisterCanvasLayoutCategory and Settings.RegisterAddOnCategory then
         local category = Settings.RegisterCanvasLayoutCategory(panel, panel.name, panel.name)
