@@ -151,3 +151,19 @@ Tate_ASQ_Options.lua    -- 设置窗口、状态条、标准选项页
 
 下載：https://github.com/tatechen88/Tate_ASQ/releases/download/v1.0.1/Tate_ASQ-v1.0.1.zip
 
+---
+
+## English
+
+**Tate_ASQ** is a World of Warcraft retail (12.x) addon that automatically adjusts `SpellQueueWindow` based on your class/spec, current latency, and location.
+
+- Enabled by default.
+- City: uses the class/spec base value directly.
+- Instance / open world: base value + world latency adaptation (World first, Home fallback).
+- Recalculates on entering game, changing spec, or changing zone (city / instance / open world).
+- Floating status bar shows the current value; draggable, remembers position, font and size adjustable.
+- Settings: Options → AddOns → 施法容错, or left-click the status bar.
+- Supports English, Simplified Chinese (zhCN), and Traditional Chinese (zhTW).
+
+Download: https://github.com/tatechen88/Tate_ASQ/releases/download/v1.0.1/Tate_ASQ-v1.0.1.zip
+
