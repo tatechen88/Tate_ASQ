@@ -641,8 +641,8 @@ do
     init:SetScript("OnEvent", function(self)
         self:UnregisterEvent("PLAYER_LOGIN")
         if not Addon.loaded then return end
-        Options.UpdateStatusBar()
         CreateMinimapButton()
         CreateInterfaceOptionsPanel()
+        Options.UpdateStatusBar()
     end)
 end
