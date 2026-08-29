@@ -585,16 +585,21 @@ local minimapButton
 local function CreateMinimapButton()
     if minimapButton then return minimapButton end
 
-    local parent = Minimap or UIParent
-    minimapButton = CreateActionButton(parent, 28, 28)
-    if Minimap then
-        minimapButton:SetPoint("BOTTOMLEFT", Minimap, "BOTTOMLEFT", 4, 4)
+    local parent = MinimapCluster or Minimap or UIParent
+    minimapButton = CreateActionButton(parent, 30, 30)
+    if MinimapCluster then
+        minimapButton:SetPoint("BOTTOMRIGHT", MinimapCluster, "BOTTOMRIGHT", -3, 3)
+    elseif Minimap then
+        minimapButton:SetPoint("BOTTOMLEFT", Minimap, "BOTTOMLEFT", -3, -3)
     else
         minimapButton:SetPoint("TOPRIGHT", UIParent, "TOPRIGHT", -220, -30)
     end
-    minimapButton:SetFrameStrata("MEDIUM")
+    minimapButton:SetFrameStrata("HIGH")
+    minimapButton:SetFrameLevel((parent == UIParent and 500) or (parent:GetFrameLevel() or 0) + 20)
+    minimapButton._bg:SetColorTexture(ACCENT_R, ACCENT_G, ACCENT_B, 0.92)
     minimapButton._text:SetText("SQ")
-    minimapButton._text:SetFontObject(GameFontNormalSmall)
+    minimapButton._text:SetFontObject(GameFontNormal)
+    minimapButton._text:SetTextColor(0, 0, 0, 1)
     minimapButton:SetScript("OnClick", function() Options.Toggle() end)
     minimapButton:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
@@ -603,6 +608,7 @@ local function CreateMinimapButton()
         GameTooltip:Show()
     end)
     minimapButton:SetScript("OnLeave", function() GameTooltip:Hide() end)
+    minimapButton:Show()
 
     return minimapButton
 end
