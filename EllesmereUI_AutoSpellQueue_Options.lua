@@ -97,7 +97,7 @@ end
 
 local function CreatePanelFrame()
     local frame = CreateFrame("Frame", "EllesmereUI_AutoSpellQueueSettings", UIParent)
-    frame:SetSize(520, 600)
+    frame:SetSize(520, 730)
     frame:SetPoint("CENTER")
     frame:SetFrameStrata("DIALOG")
     frame:EnableMouse(true)
