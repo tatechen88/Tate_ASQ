@@ -136,6 +136,7 @@ local DEFAULTS = {
     showStatus    = true,
     statusFont     = "Fonts\\FRIZQT__.TTF",  -- WoW font path, or a LibSharedMedia font name
     statusFontSize = 12,
+    version        = 1,
 }
 
 local function GetConfig()
@@ -146,6 +147,11 @@ local function GetConfig()
     end
     for k, v in pairs(DEFAULTS) do
         if db[k] == nil then db[k] = v end
+    end
+    -- One-time migration: earlier test builds could leave baseMode = "manual".
+    if db.version ~= 1 then
+        db.version = 1
+        db.baseMode = "auto"
     end
     return db
 end
