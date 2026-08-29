@@ -55,6 +55,9 @@ local LOCALES = {
         ["Status Bar Font"] = "状态条字体",
         ["Status Bar Font Size"] = "状态条字号",
         ["Formula"] = "计算式",
+        ["City"] = "城市",
+        ["Instance"] = "副本",
+        ["Open World"] = "野外",
         ["Small"] = "小",
         ["Normal"] = "普通",
         ["Large"] = "大",
@@ -97,6 +100,9 @@ local LOCALES = {
         ["Status Bar Font"] = "狀態列字體",
         ["Status Bar Font Size"] = "狀態列字號",
         ["Formula"] = "計算式",
+        ["City"] = "城市",
+        ["Instance"] = "副本",
+        ["Open World"] = "野外",
         ["Small"] = "小",
         ["Normal"] = "普通",
         ["Large"] = "大",
@@ -238,12 +244,14 @@ function Addon.Evaluate(force)
 
     local specID, classFile = GetPlayerInfo()
     local _, _, home, world = GetNetStats()
-    local target, role, base, latency = Formula.ComputeTarget(cfg, specID, classFile, home, world)
+    local context = Formula.GetContext()
+    local target, role, base, latency = Formula.ComputeTarget(cfg, specID, classFile, home, world, context)
 
     Addon.last = Addon.last or {}
     Addon.last.specID = specID
     Addon.last.classFile = classFile
     Addon.last.role = role
+    Addon.last.context = context
     Addon.last.base = base
     Addon.last.latency = latency
     Addon.last.home = home
@@ -320,6 +328,7 @@ local eventFrame = CreateFrame("Frame")
 eventFrame:RegisterEvent("ADDON_LOADED")
 eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 eventFrame:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
+eventFrame:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
 
 eventFrame:SetScript("OnEvent", function(self, event, arg1)
@@ -332,6 +341,8 @@ eventFrame:SetScript("OnEvent", function(self, event, arg1)
     elseif event == "PLAYER_ENTERING_WORLD" then
         if Addon.loaded then Addon.Evaluate(false) end
     elseif event == "PLAYER_SPECIALIZATION_CHANGED" then
+        if Addon.loaded then Addon.Evaluate(false) end
+    elseif event == "ZONE_CHANGED_NEW_AREA" then
         if Addon.loaded then Addon.Evaluate(false) end
     elseif event == "PLAYER_REGEN_ENABLED" then
         if Addon.pendingTarget then

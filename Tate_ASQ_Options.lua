@@ -393,6 +393,12 @@ local function BuildSettings(frame, showTitle)
     local lineLat = AddStatusLine(3, L("Current Latency"))
     local lineCur = AddStatusLine(4, L("Current SpellQueueWindow"))
 
+    local function ContextLabel(context)
+        if context == "city" then return L("City") end
+        if context == "instance" then return L("Instance") end
+        return L("Open World")
+    end
+
     local function UpdateStatus()
         local cfg = Addon.GetConfig()
         local state = Addon.last or {}
@@ -400,7 +406,11 @@ local function BuildSettings(frame, showTitle)
         -- Formula line: show exactly how the target is derived.
         if state.target then
             local pending = state.pending and ("  [" .. L("Pending (combat)") .. "]") or ""
-            if cfg.adaptive ~= false and state.latency then
+            if state.context == "city" then
+                lineFormula:SetText(("%d ms = %s %d (%s)"):format(
+                    state.target, L("Base Value"), state.base or 0,
+                    ContextLabel(state.context)) .. pending)
+            elseif cfg.adaptive ~= false and state.latency then
                 lineFormula:SetText(("%d ms = max(%s %d, %s %d + %d)"):format(
                     state.target,
                     L("Base Value"), state.base or 0,
@@ -415,7 +425,7 @@ local function BuildSettings(frame, showTitle)
 
         local role = state.role and L(state.role) or L("Unknown")
         local specID = state.specID or 0
-        lineSpec:SetText(role .. " / " .. specID)
+        lineSpec:SetText(role .. " / " .. specID .. " / " .. ContextLabel(state.context))
 
         if state.base then
             lineBase:SetText(state.base .. " ms")

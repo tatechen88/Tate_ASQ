@@ -181,6 +181,28 @@ function Formula.GetBase(cfg, specID, classFile)
     return FALLBACK[role]
 end
 
+--- Returns the current gameplay context: "instance" | "city" | "world".
+function Formula.GetContext()
+    if IsInInstance and IsInInstance() then
+        return "instance"
+    end
+    if C_Map and C_Map.GetBestMapForUnit and C_Map.GetMapInfo then
+        local mapID = C_Map.GetBestMapForUnit("player")
+        if mapID then
+            local info = C_Map.GetMapInfo(mapID)
+            if info and info.flags then
+                local flags = info.flags
+                if bit and bit.band then
+                    if bit.band(flags, 0x100000) ~= 0 then return "city" end
+                else
+                    if flags % 0x200000 >= 0x100000 then return "city" end
+                end
+            end
+        end
+    end
+    return "world"
+end
+
 --- Selects one latency number from home/world according to the configured source.
 function Formula.PickLatency(source, home, world)
     home = SafeNumber(home)
@@ -199,14 +221,18 @@ function Formula.PickLatency(source, home, world)
 end
 
 --- Computes the final SpellQueueWindow target.
+-- context: "instance" | "city" | "world" (from Formula.GetContext).
 -- Returns: target, role, base, latency
-function Formula.ComputeTarget(cfg, specID, classFile, home, world)
+function Formula.ComputeTarget(cfg, specID, classFile, home, world, context)
     local role = Formula.Classify(specID, classFile)
     local base = Formula.GetBase(cfg, specID, classFile)
     local latency = Formula.PickLatency(cfg.latencySource, home, world)
 
     local target
-    if cfg.adaptive ~= false then
+    if context == "city" then
+        -- Cities are safe: no need to chase latency. Keep the clean base value.
+        target = base
+    elseif cfg.adaptive ~= false then
         target = math.max(base, latency + SafeNumber(cfg.margin))
     else
         target = base
