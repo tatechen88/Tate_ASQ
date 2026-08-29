@@ -109,6 +109,7 @@ local function CreatePanelFrame()
 
     frame:SetScript("OnDragStart", function(self) self:StartMoving() end)
     frame:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
+    frame:SetScript("OnShow", function() UpdateRows() end)
 
     tinsert(UISpecialFrames, frame:GetName())
     frame:Hide()
@@ -472,6 +473,10 @@ local function BuildSettings(frame, showTitle)
     AddRowUpdater(function()
         note:SetText("|cff0cd29d" .. L("Auto SpellQueue") .. "|r  " .. L("Enabled") .. ": " .. (Addon.GetConfig().enabled and L("On") or L("Off")))
     end)
+
+    -- Apply all row updaters immediately so hidden/disabled states and values
+    -- are correct from the very first frame the user sees.
+    UpdateRows()
 end
 
 ---------------------------------------------------------------------------
@@ -633,6 +638,7 @@ local function CreateInterfaceOptionsPanel()
     panel:SetSize(520, 540)
 
     BuildSettings(panel, false)
+    panel:SetScript("OnShow", function() UpdateRows() end)
 
     if Settings and Settings.RegisterCanvasLayoutCategory and Settings.RegisterAddOnCategory then
         local category = Settings.RegisterCanvasLayoutCategory(panel, panel.name, panel.name)
