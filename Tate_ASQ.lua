@@ -128,7 +128,7 @@ local DEFAULTS = {
     baseMode      = "auto",     -- "auto" | "manual"
     manualBase    = 200,
     adaptive      = true,
-    latencySource = "max",      -- "world" | "home" | "avg" | "max"
+    latencySource = "world",    -- "world" (recommended) | "home" | "avg" | "max"
     margin        = 50,
     minWindow     = 50,
     maxWindow     = 400,
@@ -136,7 +136,7 @@ local DEFAULTS = {
     showStatus    = true,
     statusFont     = "Fonts\\FRIZQT__.TTF",  -- WoW font path, or a LibSharedMedia font name
     statusFontSize = 12,
-    version        = 1,
+    version        = 2,
 }
 
 local function GetConfig()
@@ -148,10 +148,13 @@ local function GetConfig()
     for k, v in pairs(DEFAULTS) do
         if db[k] == nil then db[k] = v end
     end
-    -- One-time migration: earlier test builds could leave baseMode = "manual".
-    if db.version ~= 1 then
-        db.version = 1
-        db.baseMode = "auto"
+    -- One-time migrations.
+    if db.version ~= 2 then
+        if db.version == nil then
+            db.baseMode = "auto"
+        end
+        db.version = 2
+        db.latencySource = "world"
     end
     return db
 end

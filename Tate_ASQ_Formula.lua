@@ -185,15 +185,17 @@ end
 function Formula.PickLatency(source, home, world)
     home = SafeNumber(home)
     world = SafeNumber(world)
-    if source == "world" then
-        return world
-    elseif source == "home" then
+    if source == "home" then
         return home
     elseif source == "avg" then
         return (home + world) / 2
+    elseif source == "max" then
+        return math.max(home, world)
     end
-    -- default: max
-    return math.max(home, world)
+    -- "world" or default: combat latency matters for the spell queue.
+    -- Fall back to home only when world is unavailable/zero.
+    if world > 0 then return world end
+    return home
 end
 
 --- Computes the final SpellQueueWindow target.

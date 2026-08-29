@@ -10,7 +10,7 @@ Tate's AutoSpellQueue — 魔兽世界正式服（12.x）插件：根据当前�
 - 仅在**进入游戏**与**切换专精（天赋）**时自动判定并写入；无定时器，不周期覆盖。
 - 基础值按职业/专精差异化（例如盗贼 140ms、战士 150ms、兽王猎 190ms、火法 245ms 等），而非单一近战/远程数值。
 - 延迟自适应：`最终值 = clamp(max(职业基础值, 当前延迟 + 50), 50, 400)`。
-- 延迟来源固定为 `max`（Home/World 取较大值），不显示在界面上。
+- 延迟来源固定为 `world`（世界/战斗服务器延迟；World 不可用时回退 Home），不显示在界面上。
 - 设置项变更立即生效（用户操作触发）。
 - 悬浮状态条只显示当前 `SpellQueueWindow` 值，可拖动；左键点击打开设置。
 - 状态条字体可选（WoW 内置字体 / LibSharedMedia 字体），字号 10–20，状态条会随字号自动缩放。
@@ -43,7 +43,7 @@ Tate's AutoSpellQueue — 魔兽世界正式服（12.x）插件：根据当前�
 | baseMode | auto |
 | manualBase | 200 |
 | adaptive | true |
-| latencySource | max |
+| latencySource | world |
 | margin | 50 |
 | minWindow | 50 |
 | maxWindow | 400 |
