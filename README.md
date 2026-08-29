@@ -94,7 +94,7 @@
 
 ## 安装
 
-1. 下载最新版：[Tate_ASQ-v1.0.0.zip](https://github.com/tatechen88/Tate_ASQ/releases/download/v1.0.1/Tate_ASQ-v1.0.1.zip)
+1. 下载最新版：[Tate_ASQ-v1.0.0.zip](https://github.com/tatechen88/Tate_ASQ/releases/download/v1.0.2/Tate_ASQ-v1.0.2.zip)
 2. 解压后把 `Tate_ASQ` 文件夹放到 `World of Warcraft\_retail_\Interface\AddOns\`。
 3. 进入游戏，插件会自动启用。
 
@@ -149,7 +149,7 @@ Tate_ASQ_Options.lua    -- 设置窗口、状态条、标准选项页
 - 設定入口：選項 → 插件 → 施法容錯；或左鍵點擊狀態條。
 - 支援繁體中文（zhTW）、簡體中文（zhCN）與英文。
 
-下載：https://github.com/tatechen88/Tate_ASQ/releases/download/v1.0.1/Tate_ASQ-v1.0.1.zip
+下載：https://github.com/tatechen88/Tate_ASQ/releases/download/v1.0.2/Tate_ASQ-v1.0.2.zip
 
 ---
 
@@ -165,5 +165,5 @@ Tate_ASQ_Options.lua    -- 设置窗口、状态条、标准选项页
 - Settings: Options → AddOns → 施法容错, or left-click the status bar.
 - Supports English, Simplified Chinese (zhCN), and Traditional Chinese (zhTW).
 
-Download: https://github.com/tatechen88/Tate_ASQ/releases/download/v1.0.1/Tate_ASQ-v1.0.1.zip
+Download: https://github.com/tatechen88/Tate_ASQ/releases/download/v1.0.2/Tate_ASQ-v1.0.2.zip
 
