@@ -171,6 +171,44 @@ local function CreateActionButton(parent, width, height)
 end
 
 ---------------------------------------------------------------------------
+--  Font helpers
+---------------------------------------------------------------------------
+local function ResolveFontPath(value)
+    if type(value) == "string" then
+        local v = value:lower()
+        if v:match("^fonts\\") or v:match("^interface\\") then
+            return value
+        end
+        local LSM = LibStub and LibStub("LibSharedMedia-3.0", true)
+        if LSM then
+            local path = LSM:Fetch("font", value)
+            if path then return path end
+        end
+    end
+    return "Fonts\\FRIZQT__.TTF"
+end
+
+local function GetFontList()
+    local list = {
+        { value = "Fonts\\FRIZQT__.TTF",    label = "Friz Quadrata (Default)" },
+        { value = "Fonts\\ARIALN.TTF",       label = "Arial Narrow" },
+        { value = "Fonts\\MORPHEUS.TTF",     label = "Morpheus" },
+        { value = "Fonts\\skurri.ttf",       label = "Skurri" },
+    }
+    local LSM = LibStub and LibStub("LibSharedMedia-3.0", true)
+    if LSM then
+        local names = LSM:List("font")
+        for _, name in ipairs(names) do
+            local path = LSM:Fetch("font", name)
+            if path then
+                table.insert(list, { value = name, label = name })
+            end
+        end
+    end
+    return list
+end
+
+---------------------------------------------------------------------------
 --  Row widgets
 ---------------------------------------------------------------------------
 local function AddToggleRow(frame, y, labelText, get, set)
@@ -258,6 +296,50 @@ local function AddCycleRow(frame, y, labelText, entries, get, set)
     end)
     AddRowUpdater(Update)
     Update()
+    return row
+end
+
+---------------------------------------------------------------------------
+--  Font dropdown row (UIDropDownMenu)
+---------------------------------------------------------------------------
+local function AddFontDropdownRow(frame, y, labelText, get, set)
+    local row = AddRow(frame, y, labelText)
+
+    local dd = CreateFrame("Frame", nil, row, "UIDropDownMenuTemplate")
+    dd:SetPoint("RIGHT", -14, 0)
+    UIDropDownMenu_SetWidth(dd, 200)
+
+    local function FontName(value)
+        for _, e in ipairs(GetFontList()) do
+            if e.value == value then return e.label end
+        end
+        return value or ""
+    end
+
+    local function Refresh()
+        UIDropDownMenu_SetText(dd, FontName(get()))
+    end
+
+    UIDropDownMenu_Initialize(dd, function(self, level)
+        local info = UIDropDownMenu_CreateInfo()
+        for _, e in ipairs(GetFontList()) do
+            local fontValue = e.value
+            local fontLabel = e.label
+            info.text = fontLabel
+            info.value = fontValue
+            info.func = function()
+                set(fontValue)
+                Refresh()
+                Options.ApplyStatusBarStyle()
+                CloseDropDownMenus()
+            end
+            info.checked = (fontValue == get())
+            UIDropDownMenu_AddButton(info)
+        end
+    end)
+
+    AddRowUpdater(Refresh)
+    Refresh()
     return row
 end
 
@@ -352,17 +434,12 @@ local function BuildSettings(frame, showTitle)
     local function AdaptiveSet(v) Addon.SetConfig("adaptive", v) end
     AddToggleRow(frame, y, L("Adaptive by latency"), AdaptiveGet, AdaptiveSet); y = y - rowH
 
-    local fontEntries = {
-        { value = "small",  label = "Small" },
-        { value = "normal", label = "Normal" },
-        { value = "large",  label = "Large" },
-    }
     local function FontGet() return Addon.GetConfig().statusFont end
     local function FontSet(v)
         Addon.SetConfig("statusFont", v, true)
         Options.ApplyStatusBarStyle()
     end
-    AddCycleRow(frame, y, L("Status Bar Font"), fontEntries, FontGet, FontSet); y = y - rowH
+    AddFontDropdownRow(frame, y, L("Status Bar Font"), FontGet, FontSet); y = y - rowH
 
     local function FontSizeGet() return Addon.GetConfig().statusFontSize end
     local function FontSizeSet(v)
@@ -431,19 +508,14 @@ end
 function Options.ApplyStatusBarStyle()
     if not statusBar or not statusBar._text then return end
     local cfg = Addon.GetConfig()
-    local fontKey = cfg.statusFont or "small"
-    local fontObj = GameFontNormalSmall
-    if fontKey == "normal" then
-        fontObj = GameFontNormal
-    elseif fontKey == "large" then
-        fontObj = GameFontNormalLarge
-    end
-    local fontPath, _, flags = fontObj:GetFont()
-    if fontPath then
-        statusBar._text:SetFont(fontPath, cfg.statusFontSize or 12, flags or "")
-    else
-        statusBar._text:SetFontObject(fontObj)
-    end
+    local fontPath = ResolveFontPath(cfg.statusFont)
+    local size = cfg.statusFontSize or 12
+    statusBar._text:SetFont(fontPath, size, "")
+    local cur = select(1, Addon.GetLiveStatus())
+    statusBar._text:SetText(("%d ms"):format(cur))
+    local w = statusBar._text:GetStringWidth() + 28
+    local h = math.max(24, size + 14)
+    statusBar:SetSize(w, h)
 end
 
 function Options.UpdateStatusBar()
@@ -459,8 +531,12 @@ end
 
 local function UpdateStatusBarText()
     if not statusBar then return end
+    local cfg = Addon.GetConfig()
     local cur, home, world = Addon.GetLiveStatus()
     statusBar._text:SetText(("%d ms"):format(cur))
+    local w = statusBar._text:GetStringWidth() + 28
+    local h = math.max(24, (cfg.statusFontSize or 12) + 14)
+    statusBar:SetSize(w, h)
 end
 
 ---------------------------------------------------------------------------

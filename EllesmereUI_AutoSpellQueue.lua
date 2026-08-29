@@ -128,7 +128,7 @@ local DEFAULTS = {
     maxWindow     = 400,
     hysteresis    = 10,
     showStatus    = true,
-    statusFont    = "small",   -- "small" | "normal" | "large"
+    statusFont     = "Fonts\\FRIZQT__.TTF",  -- WoW font path, or a LibSharedMedia font name
     statusFontSize = 12,
 }
 
