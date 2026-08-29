@@ -454,7 +454,7 @@ end
 local function UpdateStatusBarText()
     if not statusBar then return end
     local cur, home, world = Addon.GetLiveStatus()
-    statusBar._text:SetText(("%s H%d W%d | SQW %d"):format(L("Spell Queue"), Round(home or 0), Round(world or 0), cur))
+    statusBar._text:SetText(("%s H%d W%d | SQW %d ms"):format(L("Spell Queue"), Round(home or 0), Round(world or 0), cur))
 end
 
 ---------------------------------------------------------------------------
