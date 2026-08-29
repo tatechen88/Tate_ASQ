@@ -95,7 +95,7 @@ end
 
 local function CreatePanelFrame()
     local frame = CreateFrame("Frame", "Tate_ASQ_Settings", UIParent)
-    frame:SetSize(460, 540)
+    frame:SetSize(460, 580)
     frame:SetPoint("CENTER")
     frame:SetFrameStrata("DIALOG")
     frame:EnableMouse(true)
@@ -486,6 +486,13 @@ local function BuildSettings(frame, showTitle)
     end
     AddStepperRow(frame, y, L("Status Bar Font Size"), 10, 20, 1, FontSizeGet, FontSizeSet); y = y - rowH
 
+    local function ShowStatusGet() return Addon.GetConfig().showStatus end
+    local function ShowStatusSet(v)
+        Addon.SetConfig("showStatus", v, true)
+        Options.UpdateStatusBar()
+    end
+    AddToggleRow(frame, y, L("Show Status Bar"), ShowStatusGet, ShowStatusSet); y = y - rowH
+
     -- Manual base row visibility -------------------------------------------
     AddRowUpdater(function()
         local show = Addon.GetConfig().baseMode == "manual"
@@ -641,7 +648,7 @@ end)
 local function CreateInterfaceOptionsPanel()
     local panel = CreateFrame("Frame", "Tate_ASQ_InterfaceOptions", UIParent)
     panel.name = L("Spell Queue")
-    panel:SetSize(520, 540)
+    panel:SetSize(520, 580)
 
     -- Build rows on first open, not at login: keeps memory minimal until the
     -- standard options page is actually used.
