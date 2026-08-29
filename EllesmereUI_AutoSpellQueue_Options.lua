@@ -97,7 +97,7 @@ end
 
 local function CreatePanelFrame()
     local frame = CreateFrame("Frame", "EllesmereUI_AutoSpellQueueSettings", UIParent)
-    frame:SetSize(520, 730)
+    frame:SetSize(460, 440)
     frame:SetPoint("CENTER")
     frame:SetFrameStrata("DIALOG")
     frame:EnableMouse(true)
@@ -269,13 +269,13 @@ local function BuildSettings()
     CreateTitleBar(frame)
 
     local y = -54
-    local rowH = 48
+    local rowH = 44
 
     -- Status block ----------------------------------------------------------
     local status = CreateFrame("Frame", nil, frame)
     status:SetPoint("TOPLEFT", frame, "TOPLEFT", 18, y)
     status:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -18, y)
-    status:SetHeight(120)
+    status:SetHeight(130)
     local statusBg = CreateTexture(status)
     SetColor(statusBg, 0, 0, 0, 0.28)
     AddBorder(status, 1, 1, 1, 0.08)
@@ -351,39 +351,6 @@ local function BuildSettings()
     local function AdaptiveSet(v) Addon.SetConfig("adaptive", v) end
     AddToggleRow(frame, y, L("Adaptive by latency"), AdaptiveGet, AdaptiveSet); y = y - rowH
 
-    local srcEntries = {
-        { value = "max",   label = "Max" },
-        { value = "world", label = "World" },
-        { value = "home",  label = "Home" },
-        { value = "avg",   label = "Average" },
-    }
-    local function SrcGet() return Addon.GetConfig().latencySource end
-    local function SrcSet(v) Addon.SetConfig("latencySource", v) end
-    AddCycleRow(frame, y, L("Latency Source"), srcEntries, SrcGet, SrcSet); y = y - rowH
-
-    local function MarginGet() return Addon.GetConfig().margin end
-    local function MarginSet(v) Addon.SetConfig("margin", v) end
-    AddStepperRow(frame, y, L("Latency Margin"), 0, 100, 5, MarginGet, MarginSet, "ms"); y = y - rowH
-
-    local function MinGet() return Addon.GetConfig().minWindow end
-    local function MinSet(v) Addon.SetConfig("minWindow", v) end
-    AddStepperRow(frame, y, L("Min Window"), 0, 200, 10, MinGet, MinSet, "ms"); y = y - rowH
-
-    local function MaxGet() return Addon.GetConfig().maxWindow end
-    local function MaxSet(v) Addon.SetConfig("maxWindow", v) end
-    AddStepperRow(frame, y, L("Max Window"), 100, 400, 10, MaxGet, MaxSet, "ms"); y = y - rowH
-
-    local function HystGet() return Addon.GetConfig().hysteresis end
-    local function HystSet(v) Addon.SetConfig("hysteresis", v) end
-    AddStepperRow(frame, y, L("Hysteresis"), 0, 50, 5, HystGet, HystSet, "ms"); y = y - rowH
-
-    local function ShowStatusGet() return Addon.GetConfig().showStatus end
-    local function ShowStatusSet(v)
-        Addon.SetConfig("showStatus", v)
-        Options.UpdateStatusBar()
-    end
-    AddToggleRow(frame, y, L("Show Status Bar"), ShowStatusGet, ShowStatusSet); y = y - rowH
-
     -- Manual base row visibility -------------------------------------------
     AddRowUpdater(function()
         local show = Addon.GetConfig().baseMode == "manual"
@@ -408,7 +375,7 @@ local statusBar
 
 local function CreateStatusBar()
     local bar = CreateFrame("Frame", "EllesmereUI_AutoSpellQueueStatusBar", UIParent)
-    bar:SetSize(260, 34)
+    bar:SetSize(90, 26)
     bar:SetPoint("TOP", UIParent, "TOP", 0, -120)
     bar:SetFrameStrata("MEDIUM")
     bar:EnableMouse(true)
@@ -454,7 +421,7 @@ end
 local function UpdateStatusBarText()
     if not statusBar then return end
     local cur, home, world = Addon.GetLiveStatus()
-    statusBar._text:SetText(("%s H%d W%d | SQW %d ms"):format(L("Spell Queue"), Round(home or 0), Round(world or 0), cur))
+    statusBar._text:SetText(("%d ms"):format(cur))
 end
 
 ---------------------------------------------------------------------------
